@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #define BOARD_SIZE 8
 #define SHIP_LENGTH 3
@@ -61,19 +62,21 @@ void buildShip(int startsAtColumn, int startsAtRow, char orientation) {
 //   return 0;
 // }
 
-void askForBuildShips() {
-  int startsAtColumn, startsAtRow;
+void askToBuildShips() {
+  int startsAtColumn, startsAtRow, currentShip;
   int i = 0;
   char orientation;
 
   while (i < SHIP_LIMIT) {
-    printf("Informe a linha inicial do navio: ");
+    currentShip = i + 1;
+
+    printf("Informe a linha inicial do navio %d: ", currentShip);
     scanf("%d", &startsAtRow);
 
-    printf("Informe a coluna inicial do navio: ");
+    printf("Informe a coluna inicial do navio %d: ", currentShip);
     scanf("%d", &startsAtColumn);
 
-    printf("Informe a orientacao do navio (v - vertical, h - horizontal): ");
+    printf("Informe a orientacao do navio %d (v - vertical, h - horizontal): ", currentShip);
     scanf(" %c", &orientation);
 
     buildShip(startsAtColumn, startsAtRow, orientation);
@@ -83,8 +86,22 @@ void askForBuildShips() {
   }
 }
 
+int verifyPlayAgain(char playAgain[]) {
+  return strcasecmp(playAgain, "sair") != 0;
+}
+
 int main() {
-  initBoard();
-  askForBuildShips();
+  char playAgain[100];
+
+  do {
+    printf("Batalha Naval\n\n");
+    initBoard();
+    askToBuildShips();
+
+    printf("Jogar novamente ou sair? ");
+    scanf("%s", playAgain);
+
+  } while(verifyPlayAgain(playAgain));
+  
   return 0;
 }
