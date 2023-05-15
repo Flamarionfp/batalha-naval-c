@@ -1,14 +1,26 @@
+// Trabalho Flamarion Fagundes e Allan Rizi
+
+#include <stdlib.h>
+#include <unistd.h>
 #include <stdio.h>
 #include <string.h>
 
-#define BOARD_SIZE 8
-#define SHIP_LENGTH 3
-#define SHIP_LIMIT 1
+#define BOARD_SIZE 9
+#define SHIP_LENGTH 5
+#define SHIP_LIMIT 2
 #define EMPTY_IDENTIFIER '~'
 
 const char* LETTERS = "ABCDEFGHIJKLMNOPQRST";
 
 int board[BOARD_SIZE][BOARD_SIZE];
+
+void clearScreen() {
+  #ifdef _WIN32
+    system("cls");
+  #else
+    system("clear");
+  #endif
+}
 
 void initBoard() {
   for (int i = 0; i < BOARD_SIZE; i++) {
@@ -29,16 +41,15 @@ void drawBoard() {
     for (int j = 0; j < BOARD_SIZE; j++) {
       if (board[i][j] == 0)
         printf("%c ", EMPTY_IDENTIFIER);
-      else
+      else {
         printf("%d ", board[i][j]);
+      }
     }
     printf("\n");
   }
 }
 
 void buildShip(int startsAtColumn, int startsAtRow, char orientation) {  
-  printf("%c\n", orientation);
-
   for (int i = startsAtColumn; i < SHIP_LENGTH + startsAtColumn; i++) { 
     if (orientation == 'h') {
       board[startsAtRow - 1][i - 1] = 1;
@@ -97,6 +108,10 @@ int main() {
     printf("Batalha Naval\n\n");
     initBoard();
     askToBuildShips();
+    sleep(2); // adicionei esse sleep para o jogador poder ver o último barco posicionado antes de limpar a tela
+    clearScreen();
+    initBoard();
+    drawBoard();
 
     printf("Jogar novamente ou sair? ");
     scanf("%s", playAgain);
