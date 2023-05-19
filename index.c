@@ -9,6 +9,7 @@
 #define SHIP_LENGTH 5
 #define SHIP_LIMIT 1
 #define SHOTS_LIMIT 2
+#define SHIPS_DESTROYED_TO_WIN 1
 #define EMPTY_IDENTIFIER '~'
 #define SHIP_IDENTIFIER '#'
 #define SHOT_IDENTIFIER '*'
@@ -17,6 +18,7 @@ const char* LETTERS = "ABCDEFGHIJKLMNOPQRST";
 
 int shipBoard[BOARD_SIZE][BOARD_SIZE];
 int shotBoard[BOARD_SIZE][BOARD_SIZE];
+int shipsDestroyed = 0;
 
 // isso aqui vai ser definido a nível de compilação para rodar o comando de limpar a tela de acordo com a plataforma
 void clearScreen() {
@@ -25,6 +27,19 @@ void clearScreen() {
   #else
     system("clear");
   #endif
+}
+
+void askToClearScreen() {
+    char shouldClearScreen = 'n';
+
+    while (shouldClearScreen != 'v' && shouldClearScreen != 'V') {
+      printf("Pressione a tecla v para limpar a tela: \n");
+      scanf(" %c", &shouldClearScreen);
+
+      if (shouldClearScreen == 'v' || shouldClearScreen == 'V') {
+        clearScreen();
+      }
+    }
 }
 
 void initBoards() {
@@ -103,6 +118,10 @@ int verifyPlayAgain(char playAgain[]) {
   return strcasecmp(playAgain, "sair") != 0;
 }
 
+// int verifyWin() {
+//   return shipsDestroyed == SHIPS_DESTROYED_TO_WIN;
+// }
+
 void makePlay(int row, int column) {
   if (shipBoard[row - 1][column - 1] == 1) {
     printf("Acertou!\n");
@@ -134,15 +153,24 @@ void askToPlay() {
 
 int main() {
   char playAgain[100];
+  // int win;
 
   do {
     printf("Batalha Naval\n\n");
     initBoards();
     askToBuildShips();
     sleep(2); // Adicionei esse sleep para o jogador poder ver o último barco posicionado antes de limpar a tela
-    clearScreen();
+    askToClearScreen();
     drawBoard(0);  
     askToPlay();
+
+    // win = verifyWin();
+
+    // if (win) {
+    //   printf("Voce venceu!\n");
+    // } else {
+    //   printf("Voce perdeu!\n");
+    // }
 
     printf("Jogar novamente ou sair? ");
     scanf("%s", playAgain);
