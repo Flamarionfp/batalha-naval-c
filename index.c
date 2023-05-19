@@ -104,18 +104,19 @@ int verifyPlayAgain(char playAgain[]) {
 
 
 void makePlay() {
-  // implementar essa lógica
+  
 }
 
 void askToPlay() {
   int shotsRemaining = SHOTS_LIMIT;
+  int row, column;
 
   while (shotsRemaining > 0) {
     printf("Informe a linha do tiro: ");
-    scanf("%d", &shotsRemaining);
+    scanf("%d", &row);
 
     printf("Informe a coluna do tiro: ");
-    scanf("%d", &shotsRemaining);
+    scanf("%d", &column);
 
     makePlay();
     drawBoard();
