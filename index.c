@@ -7,14 +7,18 @@
 
 #define BOARD_SIZE 9
 #define SHIP_LENGTH 5
-#define SHIP_LIMIT 2
+#define SHIP_LIMIT 1
 #define SHOTS_LIMIT 2
 #define EMPTY_IDENTIFIER '~'
+#define SHIP_IDENTIFIER '#'
+#define SHOT_IDENTIFIER '*'
 
 const char* LETTERS = "ABCDEFGHIJKLMNOPQRST";
 
-int board[BOARD_SIZE][BOARD_SIZE];
+int shipBoard[BOARD_SIZE][BOARD_SIZE];
+int shotBoard[BOARD_SIZE][BOARD_SIZE];
 
+// isso aqui vai ser definido a nível de compilação para rodar o comando de limpar a tela de acordo com a plataforma
 void clearScreen() {
   #ifdef _WIN32
     system("cls");
@@ -23,14 +27,17 @@ void clearScreen() {
   #endif
 }
 
-void initBoard() {
+void initBoards() {
   for (int i = 0; i < BOARD_SIZE; i++) {
-    for (int j = 0; j < BOARD_SIZE; j++)
-      board[i][j] = 0;
+    for (int j = 0; j < BOARD_SIZE; j++) {
+      shipBoard[i][j] = 0;
+      shotBoard[i][j] = 0;
+    }
   }
 }
 
-void drawBoard() {
+// se der tempo, refatorar essa função para simplificar as condições (quebrar em funções menores)
+void drawBoard(int isShipBoard) {
   printf("  ");
   for (int i = 0; i < BOARD_SIZE; i++) {
     printf("%d ", i + 1);
@@ -40,10 +47,18 @@ void drawBoard() {
   for (int i = 0; i < BOARD_SIZE; i++) {
     printf("%c ", LETTERS[i]);
     for (int j = 0; j < BOARD_SIZE; j++) {
-      if (board[i][j] == 0)
-        printf("%c ", EMPTY_IDENTIFIER);
-      else {
-        printf("%d ", board[i][j]);
+      if (isShipBoard) {
+        if (shipBoard[i][j] == 0)
+          printf("%c ", EMPTY_IDENTIFIER);
+        else
+          printf("%c ", SHIP_IDENTIFIER);
+      } else {
+        if (shotBoard[i][j] == 0)
+          printf("%c ", EMPTY_IDENTIFIER);
+        else if (shotBoard[i][j] == 1)
+          printf("%c ", SHOT_IDENTIFIER);
+        else if (shotBoard[i][j] == 2)
+          printf("%c ", SHIP_IDENTIFIER);
       }
     }
     printf("\n");
@@ -53,26 +68,12 @@ void drawBoard() {
 void buildShip(int startsAtColumn, int startsAtRow, char orientation) {  
   for (int i = startsAtColumn; i < SHIP_LENGTH + startsAtColumn; i++) { 
     if (orientation == 'h') {
-      board[startsAtRow - 1][i - 1] = 1;
+      shipBoard[startsAtRow - 1][i - 1] = 1;
     } else {
-      board[i - 1][startsAtColumn - 1] = 1;
+      shipBoard[i - 1][startsAtColumn - 1] = 1;
     }
   }
 }
-
-// int checkValidPosition(int startsAtColumn, int startsAtRow, char orientation) {
-//   // implementar essa lógica
-//   return 1;
-// }
-
-// usar depois para validar a orientação
-// int checkValidOrientationLabel(char orientation) {
-//   if (orientation == 'v' || orientation == 'h') {
-//     return 1;
-//   }
-
-//   return 0;
-// }
 
 void askToBuildShips() {
   int startsAtColumn, startsAtRow, currentShip;
@@ -92,7 +93,7 @@ void askToBuildShips() {
     scanf(" %c", &orientation);
 
     buildShip(startsAtColumn, startsAtRow, orientation);
-    drawBoard();
+    drawBoard(1); 
 
     i++;
   }
@@ -102,9 +103,15 @@ int verifyPlayAgain(char playAgain[]) {
   return strcasecmp(playAgain, "sair") != 0;
 }
 
-
-void makePlay() {
-  
+void makePlay(int row, int column) {
+  if (shipBoard[row - 1][column - 1] == 1) {
+    printf("Acertou!\n");
+    shipBoard[row - 1][column - 1] = 2; // aqui pode ser qualquer coisa diferente de 0 (vazio) e 1 (navio) 
+    shotBoard[row - 1][column - 1] = 1;
+  } else {
+    printf("Errou!\n");
+    shotBoard[row - 1][column - 1] = 1;
+  }
 }
 
 void askToPlay() {
@@ -118,8 +125,8 @@ void askToPlay() {
     printf("Informe a coluna do tiro: ");
     scanf("%d", &column);
 
-    makePlay();
-    drawBoard();
+    makePlay(row, column);
+    drawBoard(0);  
 
     shotsRemaining--;
   }
@@ -130,18 +137,17 @@ int main() {
 
   do {
     printf("Batalha Naval\n\n");
-    initBoard();
+    initBoards();
     askToBuildShips();
-    sleep(2); // adicionei esse sleep para o jogador poder ver o último barco posicionado antes de limpar a tela
+    sleep(2); // Adicionei esse sleep para o jogador poder ver o último barco posicionado antes de limpar a tela
     clearScreen();
-    initBoard();
-    drawBoard();
+    drawBoard(0);  
     askToPlay();
 
     printf("Jogar novamente ou sair? ");
     scanf("%s", playAgain);
 
-  } while(verifyPlayAgain(playAgain));
+  } while (verifyPlayAgain(playAgain));
   
   return 0;
 }
