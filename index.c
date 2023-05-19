@@ -8,6 +8,7 @@
 #define BOARD_SIZE 9
 #define SHIP_LENGTH 5
 #define SHIP_LIMIT 2
+#define SHOTS_LIMIT 2
 #define EMPTY_IDENTIFIER '~'
 
 const char* LETTERS = "ABCDEFGHIJKLMNOPQRST";
@@ -101,6 +102,28 @@ int verifyPlayAgain(char playAgain[]) {
   return strcasecmp(playAgain, "sair") != 0;
 }
 
+
+void makePlay() {
+  // implementar essa lógica
+}
+
+void askToPlay() {
+  int shotsRemaining = SHOTS_LIMIT;
+
+  while (shotsRemaining > 0) {
+    printf("Informe a linha do tiro: ");
+    scanf("%d", &shotsRemaining);
+
+    printf("Informe a coluna do tiro: ");
+    scanf("%d", &shotsRemaining);
+
+    makePlay();
+    drawBoard();
+
+    shotsRemaining--;
+  }
+}
+
 int main() {
   char playAgain[100];
 
@@ -112,6 +135,7 @@ int main() {
     clearScreen();
     initBoard();
     drawBoard();
+    askToPlay();
 
     printf("Jogar novamente ou sair? ");
     scanf("%s", playAgain);
