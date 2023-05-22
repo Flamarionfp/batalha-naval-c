@@ -18,6 +18,9 @@ const char* LETTERS = "ABCDEFGHIJKLMNOPQRST";
 
 char players[2][100];
 int currentPlayerIndex = 0;
+int wonRoundsByPlayer[2];
+int shipsDestroyedByPlayer[2];
+int positionsHitByPlayer[2];
 
 int shipBoard[BOARD_SIZE][BOARD_SIZE];
 int shotBoard[BOARD_SIZE][BOARD_SIZE];
@@ -130,6 +133,7 @@ int verifyWin() {
 }
 
 void onWin() {
+  wonRoundsByPlayer[currentPlayerIndex]++;
   printf("Jogador %s venceu!\n", players[currentPlayerIndex]);
 }
 
@@ -137,14 +141,23 @@ void onLose() {
   printf("Jogador %s perdeu!\n", players[currentPlayerIndex]);
 }
 
+void onHitShot(int row, int column) {
+  positionsHitByPlayer[currentPlayerIndex]++;
+  printf("Acertou!\n");
+  shipBoard[row - 1][column - 1] = 2; // aqui pode ser qualquer coisa diferente de 0 (vazio) e 1 (navio) 
+  shotBoard[row - 1][column - 1] = 1;
+}
+
+void onMissedShot(int row, int column) {
+  printf("Errou!\n");
+  shotBoard[row - 1][column - 1] = 1;
+}
+
 void makePlay(int row, int column) {
   if (shipBoard[row - 1][column - 1] == 1) {
-    printf("Acertou!\n");
-    shipBoard[row - 1][column - 1] = 2; // aqui pode ser qualquer coisa diferente de 0 (vazio) e 1 (navio) 
-    shotBoard[row - 1][column - 1] = 1;
+    onHitShot(row, column);
   } else {
-    printf("Errou!\n");
-    shotBoard[row - 1][column - 1] = 1;
+    onMissedShot(row, column);
   }
 }
 
@@ -175,6 +188,14 @@ void startGame() {
   scanf("%s", players[1]);
 }
 
+void showGameReport() {
+  printf("\n");
+  for (int i = 0; i < 2; i++) {
+    printf("Jogador %s acertou %d tiro(s)\n", players[i], positionsHitByPlayer[i]);
+    printf("Jogador %s venceu %d rodada(s)\n", players[i], wonRoundsByPlayer[i]);
+  }
+}
+
 int main() {
   char playAgain[100];
   int win;
@@ -201,6 +222,8 @@ int main() {
     printf("Jogar novamente ou sair? ");
     scanf("%s", playAgain);
   } while (verifyPlayAgain(playAgain));
+
+  showGameReport();
   
   return 0;
 }
