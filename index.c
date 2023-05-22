@@ -16,6 +16,9 @@
 
 const char* LETTERS = "ABCDEFGHIJKLMNOPQRST";
 
+char players[2][100];
+int currentPlayerIndex = 0;
+
 int shipBoard[BOARD_SIZE][BOARD_SIZE];
 int shotBoard[BOARD_SIZE][BOARD_SIZE];
 int shipsDestroyed = 0;
@@ -40,6 +43,10 @@ void askToClearScreen() {
         clearScreen();
       }
     }
+}
+
+void changePlayer() {
+  currentPlayerIndex = currentPlayerIndex == 0 ? 1 : 0;
 }
 
 void initBoards() {
@@ -98,7 +105,7 @@ void askToBuildShips() {
   while (i < SHIP_LIMIT) {
     currentShip = i + 1;
 
-    printf("Informe a linha inicial do navio %d: ", currentShip);
+    printf("%s, informe a linha inicial do navio %d: ", players[currentPlayerIndex] ,currentShip);
     scanf("%d", &startsAtRow);
 
     printf("Informe a coluna inicial do navio %d: ", currentShip);
@@ -118,9 +125,17 @@ int verifyPlayAgain(char playAgain[]) {
   return strcasecmp(playAgain, "sair") != 0;
 }
 
-// int verifyWin() {
-//   return shipsDestroyed == SHIPS_DESTROYED_TO_WIN;
-// }
+int verifyWin() {
+  return shipsDestroyed == SHIPS_DESTROYED_TO_WIN;
+}
+
+void onWin() {
+  printf("Jogador %s venceu!\n", players[currentPlayerIndex]);
+}
+
+void onLose() {
+  printf("Jogador %s perdeu!\n", players[currentPlayerIndex]);
+}
 
 void makePlay(int row, int column) {
   if (shipBoard[row - 1][column - 1] == 1) {
@@ -138,7 +153,7 @@ void askToPlay() {
   int row, column;
 
   while (shotsRemaining > 0) {
-    printf("Informe a linha do tiro: ");
+    printf("%s, informe a linha do tiro: ", players[currentPlayerIndex]);
     scanf("%d", &row);
 
     printf("Informe a coluna do tiro: ");
@@ -151,30 +166,40 @@ void askToPlay() {
   }
 }
 
+void startGame() {
+  printf("Batalha Naval\n\n");
+  printf("Informe o nome do jogador 1: ");
+  scanf("%s", players[0]);
+
+  printf("Informe o nome do jogador 2: ");
+  scanf("%s", players[1]);
+}
+
 int main() {
   char playAgain[100];
-  // int win;
+  int win;
+
+  startGame();
 
   do {
-    printf("Batalha Naval\n\n");
     initBoards();
     askToBuildShips();
     sleep(2); // Adicionei esse sleep para o jogador poder ver o último barco posicionado antes de limpar a tela
     askToClearScreen();
+    changePlayer(); // troca para o jogador que vai atirar
     drawBoard(0);  
     askToPlay();
 
-    // win = verifyWin();
+    win = verifyWin();
 
-    // if (win) {
-    //   printf("Voce venceu!\n");
-    // } else {
-    //   printf("Voce perdeu!\n");
-    // }
+    if (win) {
+      onWin();
+    } else {
+      onLose();
+    }
 
     printf("Jogar novamente ou sair? ");
     scanf("%s", playAgain);
-
   } while (verifyPlayAgain(playAgain));
   
   return 0;
