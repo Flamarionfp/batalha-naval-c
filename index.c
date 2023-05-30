@@ -9,7 +9,8 @@
 #define SHOTS_LIMIT 30
 #define EMPTY_IDENTIFIER '~'
 #define SHIP_IDENTIFIER '#'
-#define SHOT_IDENTIFIER '*'
+#define SHOT_IDENTIFIER 'O'
+#define MISS_IDENTIFIER 'X'
 
 const char* LETTERS = "ABCDEFGHIJKLMNOPQRST";
 
@@ -80,6 +81,9 @@ void drawBoard(int isShipBoard) {
           printf("%3c", SHOT_IDENTIFIER);
         else if (shotBoard[i][j] == 2)
           printf("%3c", SHIP_IDENTIFIER);
+        else {
+          printf("%3c", MISS_IDENTIFIER);
+        }
       }
     }
     printf("\n");
@@ -161,13 +165,13 @@ int checkDestroyedAllShips() {
 void onHitShot(int row, int column) {
   positionsHitByPlayer[currentPlayerIndex]++;
   printf("Acertou!\n");
-  shipBoard[row - 1][column - 1] = 2; // aqui pode ser qualquer coisa diferente de 0 (vazio) e 1 (navio) 
+  shipBoard[row - 1][column - 1] = 2; 
   shotBoard[row - 1][column - 1] = 1;
 }
 
 void onMissedShot(int row, int column) {
   printf("Errou!\n");
-  shotBoard[row - 1][column - 1] = 1;
+  shotBoard[row - 1][column - 1] = 3; // aqui pode ser qualquer coisa diferente de 0, 1, 2 - vazio, tiro, navio, para representar o erro do tiro
 }
 
 void makePlay(int row, int column) {
